@@ -12,19 +12,7 @@ uses
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
   EnumSerializer in 'EnumSerializer.pas',
-  MVCFramework in '..\..\..\sources\MVCFramework.pas',
-  MVCFramework.Serializer.JsonDataObjects in '..\..\..\sources\MVCFramework.Serializer.JsonDataObjects.pas',
-  MVCFramework.ApplicationSession in '..\..\..\sources\MVCFramework.ApplicationSession.pas',
-  MVCFramework.DuckTyping in '..\..\..\sources\MVCFramework.DuckTyping.pas',
-  MVCFramework.Logger in '..\..\..\sources\MVCFramework.Logger.pas',
-  MVCFramework.Serializer.Intf in '..\..\..\sources\MVCFramework.Serializer.Intf.pas',
-  JsonDataObjects in '..\..\..\sources\JsonDataObjects.pas',
-  MVCFramework.DataSet.Utils in '..\..\..\sources\MVCFramework.DataSet.Utils.pas',
-  MVCFramework.Serializer.Commons in '..\..\..\sources\MVCFramework.Serializer.Commons.pas',
-  MVCFramework.RESTClient in '..\..\..\sources\MVCFramework.RESTClient.pas',
-  MVCFramework.RESTClient.Commons in '..\..\..\sources\MVCFramework.RESTClient.Commons.pas',
-  MVCFramework.RESTClient.Indy in '..\..\..\sources\MVCFramework.RESTClient.Indy.pas',
-  MVCFramework.RESTClient.Intf in '..\..\..\sources\MVCFramework.RESTClient.Intf.pas';
+  Serializer.JsonDataObjects in 'Serializer.JsonDataObjects.pas';
 
 var
   runner : ITestRunner;

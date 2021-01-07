@@ -6,15 +6,17 @@ uses
   DUnitX.TestFramework,
   MVCFramework.Commons,
   MVCFramework.Serializer.Intf,
+  MVCFramework.Serializer.Commons,
   MVCFramework.Serializer.JsonDataObjects,
-  MVCFramework.Serializer.Commons;
+  Serializer.JsonDataObjects;
 
 type
 
   [TestFixture]
   TMVCTestSerializerEnums = class(TObject)
   private
-
+    fSerializer: IMVCSerializer;
+    fMVCSerializer: IMVCSerializer;
   public
     [Setup]
     procedure Setup;
@@ -22,11 +24,9 @@ type
     procedure TearDown;
 
     [Test]
-    procedure TestSerializeEnum;
+    procedure TestMySerializeEnum;
     [Test]
-    procedure TestSerializeEnumOrd;
-    [Test]
-    procedure TestSerializeEnumName;
+    procedure TestBaseSerializeEnum;
   end;
 
   TMonthEnum = (meJanuary, meFebruary, meMarch, meApril);
@@ -53,133 +53,78 @@ implementation
 
 procedure TMVCTestSerializerEnums.Setup;
 begin
-
+  fSerializer := TJsonDataObjectsSerializer.Create;
+  fMVCSerializer := TMVCJsonDataObjectsSerializer.Create;
 end;
 
 procedure TMVCTestSerializerEnums.TearDown;
 begin
   inherited;
+  fSerializer := nil;
+  fMVCSerializer := nil;
 end;
 
-procedure TMVCTestSerializerEnums.TestSerializeEnum;
+procedure TMVCTestSerializerEnums.TestBaseSerializeEnum;
 const
   JSON = '{' + '"Month":"meJanuary",' + '"MonthName":"January",' + '"MonthName2":"meFebruary",' +
     '"MonthOrder":0' + '}';
 var
   O: TEntityWithEnums;
   S: string;
-  Serializer: IMVCSerializer;
 begin
-  Serializer := TMVCJsonDataObjectsSerializer.Create();
+  O := TEntityWithEnums.Create;
   try
-    O := TEntityWithEnums.Create;
-    try
-      O.Month := TMonthEnum.meJanuary;
-      O.MonthName := TMonthEnum.meJanuary;
-      O.MonthName2 := TMonthEnum.meFebruary;
-      O.MonthOrder := TMonthEnum.meJanuary;
-      S := Serializer.SerializeObject(O);
-      Assert.areEqual(JSON, S);
-    finally
-      O.Free;
-    end;
-
-    O := TEntityWithEnums.Create;
-    try
-      Serializer.DeserializeObject(S, O);
-      Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.Month));
-      Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.MonthName));
-      Assert.areEqual(Ord(TMonthEnum.meFebruary), Ord(O.MonthName2));
-      Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.MonthOrder));
-    finally
-      O.Free;
-    end;
+    O.Month := TMonthEnum.meJanuary;
+    O.MonthName := TMonthEnum.meJanuary;
+    O.MonthName2 := TMonthEnum.meFebruary;
+    O.MonthOrder := TMonthEnum.meJanuary;
+    S := fMVCSerializer.SerializeObject(O);
+    Assert.areEqual(JSON, S);
   finally
-    Serializer := nil;
+    O.Free;
+  end;
+
+  O := TEntityWithEnums.Create;
+  try
+    fMVCSerializer.DeserializeObject(S, O);
+    Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.Month));
+    Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.MonthName));
+    Assert.areEqual(Ord(TMonthEnum.meFebruary), Ord(O.MonthName2));
+    Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.MonthOrder));
+  finally
+    O.Free;
   end;
 end;
 
-procedure TMVCTestSerializerEnums.TestSerializeEnumName;
-const
-  JSON = '{' + '"Month":"meJanuary",' + '"MonthName":"January",' + '"MonthName2":"meFebruary",' +
-    '"MonthOrder":0' + '}';
-var
-  O: TEntityWithEnums;
-  S: string;
-  Serializer: IMVCSerializer;
-  Config: TMVCConfig;
-begin
-  Config := TMVCConfig.Create;
-  Config[TMVCConfigKey.EnumSerializationType] := 'estEnumName';
-  Serializer := TMVCJsonDataObjectsSerializer.Create(Config);
-  try
-    O := TEntityWithEnums.Create;
-    try
-      O.Month := TMonthEnum.meJanuary;
-      O.MonthName := TMonthEnum.meJanuary;
-      O.MonthName2 := TMonthEnum.meFebruary;
-      O.MonthOrder := TMonthEnum.meJanuary;
-      S := Serializer.SerializeObject(O);
-      Assert.areEqual(JSON, S);
-    finally
-      O.Free;
-    end;
-
-    O := TEntityWithEnums.Create;
-    try
-      Serializer.DeserializeObject(S, O);
-      Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.Month));
-      Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.MonthName));
-      Assert.areEqual(Ord(TMonthEnum.meFebruary), Ord(O.MonthName2));
-      Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.MonthOrder));
-    finally
-      O.Free;
-    end;
-  finally
-    Config.Free;
-    Serializer := nil;
-  end;
-end;
-
-procedure TMVCTestSerializerEnums.TestSerializeEnumOrd;
+procedure TMVCTestSerializerEnums.TestMySerializeEnum;
 const
   JSON = '{' + '"Month":0,' + '"MonthName":"January",' + '"MonthName2":"meFebruary",' +
     '"MonthOrder":0' + '}';
 var
   O: TEntityWithEnums;
   S: string;
-  Serializer: IMVCSerializer;
-  Config: TMVCConfig;
 begin
-  Config := TMVCConfig.Create;
-  Config[TMVCConfigKey.EnumSerializationType] := 'estEnumOrd';
-  Serializer := TMVCJsonDataObjectsSerializer.Create(Config);
+  O := TEntityWithEnums.Create;
   try
-    O := TEntityWithEnums.Create;
-    try
-      O.Month := TMonthEnum.meJanuary;
-      O.MonthName := TMonthEnum.meJanuary;
-      O.MonthName2 := TMonthEnum.meFebruary;
-      O.MonthOrder := TMonthEnum.meJanuary;
-      S := Serializer.SerializeObject(O);
-      Assert.areEqual(JSON, S);
-    finally
-      O.Free;
-    end;
-
-    O := TEntityWithEnums.Create;
-    try
-      Serializer.DeserializeObject(S, O);
-      Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.Month));
-      Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.MonthName));
-      Assert.areEqual(Ord(TMonthEnum.meFebruary), Ord(O.MonthName2));
-      Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.MonthOrder));
-    finally
-      O.Free;
-    end;
+    O.Month := TMonthEnum.meJanuary;
+    O.MonthName := TMonthEnum.meJanuary;
+    O.MonthName2 := TMonthEnum.meFebruary;
+    O.MonthOrder := TMonthEnum.meJanuary;
+    S := fSerializer.SerializeObject(O);
+    Assert.areEqual(JSON, S);
   finally
-    Config.Free;
-    Serializer := nil;
+    O.Free;
+  end;
+
+  O := TEntityWithEnums.Create;
+  try
+    fSerializer.DeserializeObject(S, O);
+    Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.Month));
+    Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.MonthName));
+    Assert.areEqual(Ord(TMonthEnum.meFebruary), Ord(O.MonthName2));
+    Assert.areEqual(Ord(TMonthEnum.meJanuary), Ord(O.MonthOrder));
+  finally
+    O.Free;
   end;
 end;
 

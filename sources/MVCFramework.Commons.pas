@@ -159,7 +159,6 @@ type
     MaxRequestSize = 'max_request_size'; // bytes
     HATEOSPropertyName = 'hateos';
     LoadSystemControllers = 'load_system_controllers';
-    EnumSerializationType = 'estEnumName';
   end;
 
   TMVCHostingFrameworkType = (hftUnknown, hftIndy, hftApache, hftISAPI);

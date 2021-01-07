@@ -69,7 +69,6 @@ type
     fStringDictionarySerializer: IMVCTypeSerializer;
     function TryMapNullableFloat(var Value: TValue;
       const JSONDataObject: TJsonObject; const AttribName: string): Boolean;
-    function GetDefaultEnumSerType: TMVCEnumSerializationType;
   public
     function GetDataSetFields(const ADataSet: TDataSet; const AIgnoredFields: TMVCIgnoredList;
       const ANameCase: TMVCNameCase = ncAsIs): TMVCDataSetFields;
@@ -173,6 +172,7 @@ type
     class function ParseObject(const AString: string): TJDOJsonObject;
     class function ParseArray(const AString: string): TJDOJsonArray;
     class function Parse<T: TJsonBaseObject>(const AString: string): T;
+    function GetDefaultEnumSerType: TMVCEnumSerializationType; virtual;
   public
     procedure AfterConstruction; override;
   end;
@@ -1124,7 +1124,7 @@ begin
         end
         else if (AValue.Kind = tkEnumeration) then
         begin
-          LEnumSerType := estEnumName;
+          LEnumSerType := GetDefaultEnumSerType;
           LEnumMappedValues := nil;
           if TMVCSerializerHelper.AttributeExists<MVCEnumSerializationAttribute>(ACustomAttributes, LEnumAsAttr) then
           begin
@@ -2267,10 +2267,7 @@ end;
 
 function TMVCJsonDataObjectsSerializer.GetDefaultEnumSerType: TMVCEnumSerializationType;
 begin
-  if (FConfig <> nil) and (FConfig.ContainsKey(TMVCConfigKey.EnumSerializationType)) then
-    Result := TMVCEnumSerializationType(GetEnumValue(TypeInfo(TMVCEnumSerializationType), FConfig.Value[TMVCConfigKey.EnumSerializationType]))
-  else
-    Result := estEnumName;
+  Result := estEnumName;
 end;
 
 procedure TMVCJsonDataObjectsSerializer.AddTValueToJsonArray(const Value: TValue; const JSON: TJDOJsonArray);
